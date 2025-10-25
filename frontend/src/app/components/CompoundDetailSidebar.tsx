@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Compound } from "./CompoundTable";
 import Card from "./Card";
 import Button from "./Button";
+// Import new sidebar tabs
+import { ThreeMolecularTab, MLPerformanceTab, BindingAnalysisTab } from "./sidebar-tabs";
 
 interface CompoundDetailSidebarProps {
   compound: Compound | null;
@@ -233,7 +235,7 @@ const OptimizationSuggestions = ({ compound }: { compound: Compound }) => {
 };
 
 export default function CompoundDetailSidebar({ compound, onClose, className = "" }: CompoundDetailSidebarProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'mechanisms' | 'optimization'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'mechanisms' | 'optimization' | '3d-structure' | 'ml-performance' | 'binding-analysis'>('overview');
 
   if (!compound) {
     return null;
@@ -259,22 +261,31 @@ export default function CompoundDetailSidebar({ compound, onClose, className = "
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex space-x-1 mt-4 bg-axiom-groove-light rounded-lg p-1">
+        <div className="flex flex-wrap gap-1 mt-4 bg-axiom-groove-light rounded-lg p-1">
           {[
-            { key: 'overview', label: 'Overview' },
-            { key: 'mechanisms', label: 'Mechanisms' },
-            { key: 'optimization', label: 'AI Assist' }
+            { key: 'overview', label: 'Overview', icon: '📊' },
+            { key: 'mechanisms', label: 'Mechanisms', icon: '🧬' },
+            { key: 'optimization', label: 'AI Assist', icon: '🤖' },
+            { key: '3d-structure', label: '3D Structure', icon: '🔬', tech: 'Three.js' },
+            { key: 'ml-performance', label: 'ML Performance', icon: '📈', tech: 'Chart.js + D3' },
+            { key: 'binding-analysis', label: 'Binding Analysis', icon: '⚛️', tech: 'WebGL + Vega' }
           ].map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as any)}
-              className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 cursor-pointer ${
+              className={`flex items-center space-x-1 px-2 py-2 text-xs font-medium rounded-md transition-all duration-200 cursor-pointer ${
                 activeTab === tab.key
                   ? 'bg-white text-axiom-text-primary shadow-sm'
                   : 'text-axiom-text-secondary hover:text-axiom-text-primary hover:bg-white/70 hover:shadow-sm'
               }`}
             >
-              {tab.label}
+              <span>{tab.icon}</span>
+              <span>{tab.label}</span>
+              {tab.tech && (
+                <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-medium">
+                  {tab.tech}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -336,7 +347,7 @@ export default function CompoundDetailSidebar({ compound, onClose, className = "
               <h3 className="text-lg font-semibold text-axiom-text-primary mb-3">AI Optimization Suggestions</h3>
               <OptimizationSuggestions compound={compound} />
             </div>
-            
+
             <div className="flex space-x-2">
               <Button variant="yellow" size="sm" className="flex-1">
                 Generate More
@@ -346,6 +357,19 @@ export default function CompoundDetailSidebar({ compound, onClose, className = "
               </Button>
             </div>
           </>
+        )}
+
+        {/* NEW TABS */}
+        {activeTab === '3d-structure' && compound && (
+          <ThreeMolecularTab compound={compound} />
+        )}
+
+        {activeTab === 'ml-performance' && compound && (
+          <MLPerformanceTab compound={compound} />
+        )}
+
+        {activeTab === 'binding-analysis' && compound && (
+          <BindingAnalysisTab compound={compound} />
         )}
       </div>
     </div>
