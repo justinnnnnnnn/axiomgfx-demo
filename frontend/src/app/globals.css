@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  /* AxiomGFX Color Palette - EXACT Brand Colors */
+  
+  /* Background Colors */
+  --axiom-bg-primary: #ede9e6;
+  --axiom-bg-card-white: #fdfdfd;
+  --axiom-bg-card-beige: #f5f3f2;
+  --axiom-bg-graph-white: #f9faf8;
+  
+  /* Gradient & Grooves */
+  --axiom-gradient-base: #f3f2ef;
+  --axiom-groove-light: #e8e7e4;
+  --axiom-groove-dark: #d9d8d4;
+  
+  /* Yellow Accent Colors */
+  --axiom-yellow-button: #ffe14e;
+  --axiom-yellow-main: #ffe562;
+  --axiom-yellow-dark: #ffe458;
+  --axiom-yellow-light: #ffffdf;
+  --axiom-yellow-hover: #f0d42a;
+  
+  /* Data Visualization */
+  --axiom-graph-green: #46695c;
+  --axiom-graph-blue: #4f7ea9;
+  --axiom-graph-red: #fdfdfd;
+  
+  /* Text Colors */
+  --axiom-text-primary: #0A0A0A;
+  --axiom-text-secondary: #3D3D3D;
+  --axiom-text-light: #5A5A5A;
+  
+  /* Utility */
+  --axiom-dark-button: #333333;
+  --axiom-black: #000000;
+  --axiom-border-light: #d9d8d4;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  color: #0A0A0A;
+  background-color: #ede9e6;
+}
+
