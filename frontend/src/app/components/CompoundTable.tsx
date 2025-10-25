@@ -105,7 +105,7 @@ export default function CompoundTable({ compounds, onSelect, selectedId, classNa
     <div className={`rounded-2xl border border-axiom-border-light shadow-lg overflow-hidden ${className}`} style={{ backgroundColor: '#fdfdfd' }}>
       {/* Header */}
       <div className="px-4 py-4 border-b border-axiom-border-light" style={{ backgroundColor: '#f5f3f2' }}>
-        <div className="grid gap-4 items-center text-sm font-semibold text-axiom-text-primary" style={{ gridTemplateColumns: '80px 1fr 80px 80px 80px 80px 80px 80px 140px' }}>
+        <div className="grid gap-4 items-center text-sm font-semibold text-axiom-text-primary" style={{ gridTemplateColumns: '80px 1fr 80px 80px 80px 80px 80px 80px 120px' }}>
           <div className="text-center">Structure</div>
           <SortableHeaderDiv field="name" sortField={sortField} sortDirection={sortDirection} onSort={handleSort}>
             Compound Name
@@ -160,7 +160,7 @@ export default function CompoundTable({ compounds, onSelect, selectedId, classNa
             }}
             onClick={() => onSelect && onSelect(compound)}
           >
-            <div className="grid gap-4 items-center" style={{ gridTemplateColumns: '80px 1fr 80px 80px 80px 80px 80px 80px 140px' }}>
+            <div className="grid gap-4 items-center" style={{ gridTemplateColumns: '80px 1fr 80px 80px 80px 80px 80px 80px 120px' }}>
               {/* Structure */}
               <div className="flex justify-center">
                 <MoleculeIcon compound={compound} />
