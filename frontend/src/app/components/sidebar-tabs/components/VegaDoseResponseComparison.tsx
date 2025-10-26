@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
-import * as vega from 'vega';
-import * as vegaLite from 'vega-lite';
 import vegaEmbed from 'vega-embed';
+import type { VisualizationSpec } from 'vega-embed';
 import { Compound } from '../../../lib/types';
 
 interface VegaDoseResponseComparisonProps {
@@ -75,7 +74,7 @@ export default function VegaDoseResponseComparison({ compound }: VegaDoseRespons
     ];
 
     // Create Vega-Lite specification
-    const spec = {
+    const spec: VisualizationSpec = {
       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
       "background": "#f9faf8", // axiom-bg-graph-white
       "data": {"values": data},
@@ -85,8 +84,7 @@ export default function VegaDoseResponseComparison({ compound }: VegaDoseRespons
         "point": {
           "size": 30,
           "filled": true
-        },
-        "tooltip": true
+        }
       },
       "encoding": {
         "x": {
