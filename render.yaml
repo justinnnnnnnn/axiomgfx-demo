@@ -9,10 +9,7 @@ services:
     healthCheckPath: /health
     envVars:
       - key: CORS_ORIGIN
-        fromService:
-          type: web
-          name: axiomgfx-web
-          property: url
+        value: https://axiomgfx-web.onrender.com
 
   - type: web
     name: axiomgfx-web
@@ -23,8 +20,5 @@ services:
     autoDeploy: true
     envVars:
       - key: NEXT_PUBLIC_API_BASE
-        fromService:
-          type: web
-          name: axiomgfx-api
-          property: url
+        value: https://axiomgfx-api.onrender.com
 
