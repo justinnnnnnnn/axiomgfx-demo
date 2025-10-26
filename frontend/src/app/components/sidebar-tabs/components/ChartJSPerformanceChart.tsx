@@ -1,38 +1,20 @@
 "use client";
 
-import React from 'react';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  PointElement,
-  LineElement,
-} from 'chart.js';
+import React, { useEffect } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import { registerChartJS } from '../../../lib/chartjs-config';
 import { Compound } from '../../../lib/types';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-);
 
 interface ChartJSPerformanceChartProps {
   compound: Compound;
 }
 
 export default function ChartJSPerformanceChart({ compound }: ChartJSPerformanceChartProps) {
+  // Register Chart.js components on client side
+  useEffect(() => {
+    registerChartJS();
+  }, []);
+
   // Generate performance data based on compound characteristics
   const getPerformanceData = (compound: Compound) => {
     // Base accuracy depends on risk score - easier to predict extreme cases

@@ -224,30 +224,31 @@ export default function D3ConfidenceHeatmap({ compound }: D3ConfidenceHeatmapPro
       {/* Custom tooltip */}
       <div
         ref={tooltipRef}
-        className="absolute pointer-events-none opacity-0 transition-opacity duration-200 z-10"
+        className="absolute pointer-events-none opacity-0 transition-opacity duration-200 z-50"
         style={{
           transform: 'translateX(-50%) translateY(-100%)',
         }}
       >
         {hoveredCell && (
-          <div className="bg-axiom-bg-card-white border border-axiom-border-light rounded-lg shadow-lg p-3 text-xs">
-            <div className="font-semibold text-axiom-text-primary mb-1">
+          <div className="bg-white border border-axiom-border-light rounded-lg shadow-xl p-3 text-xs backdrop-blur-sm"
+               style={{ backgroundColor: 'rgba(255, 255, 255, 0.98)' }}>
+            <div className="font-semibold text-axiom-text-primary mb-2">
               {hoveredCell.endpoint} - {hoveredCell.assay}
             </div>
-            <div className="space-y-1">
-              <div className="flex justify-between">
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center">
                 <span className="text-axiom-text-secondary">Confidence:</span>
                 <span className="font-medium text-axiom-text-primary">
                   {(hoveredCell.confidence * 100).toFixed(1)}%
                 </span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-axiom-text-secondary">Samples:</span>
                 <span className="font-medium text-axiom-text-primary">
                   {hoveredCell.samples.toLocaleString()}
                 </span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-axiom-text-secondary">Quality:</span>
                 <span className={`font-medium ${
                   hoveredCell.confidence > 0.9 ? 'text-green-600' :

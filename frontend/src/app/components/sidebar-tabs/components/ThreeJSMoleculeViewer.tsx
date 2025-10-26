@@ -26,18 +26,20 @@ export default function ThreeJSMoleculeViewer({ compound, className = '' }: Thre
     scene.background = new THREE.Color(0xf9faf8); // axiom-bg-graph-white
     
     // Camera setup
-    const camera = new THREE.PerspectiveCamera(75, 300 / 200, 0.1, 1000);
-    camera.position.set(0, 0, 30);
-    
+    const camera = new THREE.PerspectiveCamera(75, 280 / 180, 0.1, 1000);
+    camera.position.set(0, 0, 25);
+    camera.lookAt(0, 0, 0);
+
     // Renderer setup
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(300, 200);
+    renderer.setSize(280, 180);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     mountRef.current.appendChild(renderer.domElement);
     
     // Create molecular structure based on compound
     const moleculeGroup = createMolecularStructure(compound);
+    moleculeGroup.position.set(0, 0, 0); // Center at origin
     scene.add(moleculeGroup);
     
     // Lighting setup
@@ -117,10 +119,10 @@ export default function ThreeJSMoleculeViewer({ compound, className = '' }: Thre
   }, [compound, isHovered]);
 
   return (
-    <div className={`bg-axiom-bg-graph-white rounded-lg ${className}`}>
-      <div 
-        ref={mountRef} 
-        className="w-full h-48 flex items-center justify-center cursor-grab active:cursor-grabbing"
+    <div className={`bg-axiom-bg-graph-white rounded-lg overflow-hidden ${className}`}>
+      <div
+        ref={mountRef}
+        className="w-full h-44 flex items-center justify-center cursor-grab active:cursor-grabbing"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       />
@@ -139,12 +141,12 @@ function createMolecularStructure(compound: Compound): THREE.Group {
         return {
           atoms: [
             { pos: [0, 0, 0], element: 'C', color: 0x4CAF50 },
-            { pos: [2, 0, 0], element: 'N', color: 0x2196F3 },
-            { pos: [-2, 0, 0], element: 'N', color: 0x2196F3 },
-            { pos: [0, 2, 0], element: 'N', color: 0x2196F3 },
-            { pos: [0, -2, 0], element: 'N', color: 0x2196F3 },
-            { pos: [4, 0, 0], element: 'C', color: 0x4CAF50 },
-            { pos: [-4, 0, 0], element: 'C', color: 0x4CAF50 },
+            { pos: [1.5, 0, 0], element: 'N', color: 0x2196F3 },
+            { pos: [-1.5, 0, 0], element: 'N', color: 0x2196F3 },
+            { pos: [0, 1.5, 0], element: 'N', color: 0x2196F3 },
+            { pos: [0, -1.5, 0], element: 'N', color: 0x2196F3 },
+            { pos: [3, 0, 0], element: 'C', color: 0x4CAF50 },
+            { pos: [-3, 0, 0], element: 'C', color: 0x4CAF50 },
           ],
           bonds: [[0, 1], [0, 2], [0, 3], [0, 4], [1, 5], [2, 6]]
         };
@@ -152,13 +154,13 @@ function createMolecularStructure(compound: Compound): THREE.Group {
         return {
           atoms: [
             { pos: [0, 0, 0], element: 'C', color: 0xFF9800 },
-            { pos: [2, 1, 0], element: 'C', color: 0xFF9800 },
-            { pos: [2, -1, 0], element: 'C', color: 0xFF9800 },
-            { pos: [-2, 1, 0], element: 'N', color: 0x2196F3 },
-            { pos: [-2, -1, 0], element: 'O', color: 0xF44336 },
-            { pos: [4, 0, 0], element: 'C', color: 0xFF9800 },
-            { pos: [-4, 0, 0], element: 'C', color: 0xFF9800 },
-            { pos: [0, 3, 0], element: 'Cl', color: 0x9E9E9E },
+            { pos: [1.5, 0.8, 0], element: 'C', color: 0xFF9800 },
+            { pos: [1.5, -0.8, 0], element: 'C', color: 0xFF9800 },
+            { pos: [-1.5, 0.8, 0], element: 'N', color: 0x2196F3 },
+            { pos: [-1.5, -0.8, 0], element: 'O', color: 0xF44336 },
+            { pos: [3, 0, 0], element: 'C', color: 0xFF9800 },
+            { pos: [-3, 0, 0], element: 'C', color: 0xFF9800 },
+            { pos: [0, 2.2, 0], element: 'Cl', color: 0x9E9E9E },
           ],
           bonds: [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [1, 5], [3, 6], [2, 7]]
         };

@@ -1,15 +1,18 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Compound } from '../../lib/types';
 import ChartJSPerformanceChart from './components/ChartJSPerformanceChart';
 import D3ConfidenceHeatmap from './components/D3ConfidenceHeatmap';
+import ExpandableModal from '../ExpandableModal';
+import EnhancedMLPerformanceModal from './modals/EnhancedMLPerformanceModal';
 
 interface MLPerformanceTabProps {
   compound: Compound;
 }
 
 export default function MLPerformanceTab({ compound }: MLPerformanceTabProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // Calculate performance metrics based on compound characteristics
   const getModelMetrics = (compound: Compound) => {
     // Base accuracy depends on how "predictable" the compound is
@@ -113,8 +116,11 @@ export default function MLPerformanceTab({ compound }: MLPerformanceTabProps) {
 
   return (
     <div className="space-y-4">
-      {/* Performance Overview */}
-      <div className="bg-axiom-bg-card-white rounded-lg border border-axiom-border-light p-4">
+      {/* Performance Overview - Clickable Card */}
+      <div
+        className="bg-axiom-bg-card-white rounded-lg border border-axiom-border-light p-4 cursor-pointer hover:shadow-md transition-all duration-200 relative group"
+        onClick={() => setIsModalOpen(true)}
+      >
         <div className="flex items-center justify-between mb-3">
           <h4 className="text-lg font-semibold text-axiom-text-primary">
             Model Performance: {compound.name}
@@ -125,6 +131,9 @@ export default function MLPerformanceTab({ compound }: MLPerformanceTabProps) {
             </span>
             <span className={`text-xs px-2 py-1 rounded font-medium ${performanceCategory.bg} ${performanceCategory.color}`}>
               {performanceCategory.label}
+            </span>
+            <span className="text-xs text-axiom-text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+              Click to expand
             </span>
           </div>
         </div>
@@ -175,7 +184,7 @@ export default function MLPerformanceTab({ compound }: MLPerformanceTabProps) {
         <D3ConfidenceHeatmap compound={compound} />
         
         <div className="mt-3 text-xs text-axiom-text-secondary">
-          💡 <strong>Interactive:</strong> Hover over cells to see detailed confidence metrics and sample counts
+          💡 <strong>Interactive:</strong> Hover cells for detailed metrics
         </div>
       </div>
 
@@ -184,49 +193,33 @@ export default function MLPerformanceTab({ compound }: MLPerformanceTabProps) {
         <h4 className="text-sm font-medium text-axiom-text-primary mb-3">
           Training Dataset Information
         </h4>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-axiom-text-secondary">Similar Compounds</span>
-              <span className="font-medium text-axiom-text-primary">
-                {trainingInfo.similarCompounds.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-axiom-text-secondary">Total Samples</span>
-              <span className="font-medium text-axiom-text-primary">
-                {trainingInfo.totalSamples.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-axiom-text-secondary">Literature Studies</span>
-              <span className="font-medium text-axiom-text-primary">
-                {trainingInfo.studyCount}
-              </span>
-            </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+            <span className="text-sm text-axiom-text-secondary">Similar Compounds</span>
+            <span className="font-medium text-axiom-text-primary">
+              {trainingInfo.similarCompounds.toLocaleString()}
+            </span>
           </div>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-axiom-text-secondary">Data Quality</span>
-              <span className={`font-medium ${
-                trainingInfo.dataQuality === 'Excellent' ? 'text-green-600' :
-                trainingInfo.dataQuality === 'Good' ? 'text-blue-600' : 'text-orange-600'
-              }`}>
-                {trainingInfo.dataQuality}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-axiom-text-secondary">Last Updated</span>
-              <span className="font-medium text-axiom-text-primary">
-                {trainingInfo.lastUpdated}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-axiom-text-secondary">Model Version</span>
-              <span className="font-medium text-axiom-text-primary">
-                v2.1.3
-              </span>
-            </div>
+          <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+            <span className="text-sm text-axiom-text-secondary">Total Samples</span>
+            <span className="font-medium text-axiom-text-primary">
+              {trainingInfo.totalSamples.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+            <span className="text-sm text-axiom-text-secondary">Data Quality</span>
+            <span className={`font-medium ${
+              trainingInfo.dataQuality === 'Excellent' ? 'text-green-600' :
+              trainingInfo.dataQuality === 'Good' ? 'text-blue-600' : 'text-orange-600'
+            }`}>
+              {trainingInfo.dataQuality}
+            </span>
+          </div>
+          <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+            <span className="text-sm text-axiom-text-secondary">Last Updated</span>
+            <span className="font-medium text-axiom-text-primary">
+              {trainingInfo.lastUpdated}
+            </span>
           </div>
         </div>
       </div>
@@ -302,6 +295,15 @@ export default function MLPerformanceTab({ compound }: MLPerformanceTabProps) {
           )}
         </div>
       </div>
+
+      {/* Expandable Modal */}
+      <ExpandableModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={`ML Performance Analysis: ${compound.name}`}
+      >
+        <EnhancedMLPerformanceModal compound={compound} />
+      </ExpandableModal>
     </div>
   );
 }

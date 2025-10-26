@@ -1,14 +1,17 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Compound } from '../../lib/types';
 import ThreeJSMoleculeViewer from './components/ThreeJSMoleculeViewer';
+import ExpandableModal from '../ExpandableModal';
+import Enhanced3DStructureModal from './modals/Enhanced3DStructureModal';
 
 interface ThreeMolecularTabProps {
   compound: Compound;
 }
 
 export default function ThreeMolecularTab({ compound }: ThreeMolecularTabProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const getRiskLevel = (score: number) => {
     if (score < 3.3) return { level: 'Low', color: 'text-green-600', bg: 'bg-green-50' };
     if (score < 6.6) return { level: 'Medium', color: 'text-orange-600', bg: 'bg-orange-50' };
@@ -81,22 +84,29 @@ export default function ThreeMolecularTab({ compound }: ThreeMolecularTabProps) 
 
   return (
     <div className="space-y-4">
-      {/* 3D Molecular Viewer */}
-      <div className="bg-axiom-bg-card-white rounded-lg border border-axiom-border-light p-4">
+      {/* 3D Molecular Viewer - Clickable Card */}
+      <div
+        className="bg-axiom-bg-card-white rounded-lg border border-axiom-border-light p-4 cursor-pointer hover:shadow-md transition-all duration-200 relative group"
+        onClick={() => setIsModalOpen(true)}
+      >
         <div className="flex items-center justify-between mb-3">
           <h4 className="text-lg font-semibold text-axiom-text-primary">
             Interactive 3D Structure
           </h4>
-          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">
-            Three.js
-          </span>
+          <div className="flex items-center space-x-2">
+            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">
+              Three.js
+            </span>
+            <span className="text-xs text-axiom-text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+              Click to expand
+            </span>
+          </div>
         </div>
         
         <ThreeJSMoleculeViewer compound={compound} />
         
-        <div className="mt-3 text-xs text-axiom-text-secondary space-y-1">
-          <div>🖱️ <strong>Click & drag</strong> to rotate • <strong>Hover</strong> to pause auto-rotation</div>
-          <div>🎨 <strong>Colors:</strong> Green = Low risk • Orange = Medium • Red = High risk atoms</div>
+        <div className="mt-3 text-xs text-axiom-text-secondary">
+          🖱️ <strong>Interactive:</strong> Click & drag to rotate • Hover to pause
         </div>
       </div>
 
@@ -234,6 +244,15 @@ export default function ThreeMolecularTab({ compound }: ThreeMolecularTabProps) 
           )}
         </div>
       </div>
+
+      {/* Expandable Modal */}
+      <ExpandableModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={`3D Structure Analysis: ${compound.name}`}
+      >
+        <Enhanced3DStructureModal compound={compound} />
+      </ExpandableModal>
     </div>
   );
 }
