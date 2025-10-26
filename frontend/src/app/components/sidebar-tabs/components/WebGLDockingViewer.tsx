@@ -8,8 +8,8 @@ interface WebGLDockingViewerProps {
 }
 
 export default function WebGLDockingViewer({ compound }: WebGLDockingViewerProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const animationRef = useRef<number | null>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const [isRunning, setIsRunning] = useState(true);
   const [simulationTime, setSimulationTime] = useState(0);
