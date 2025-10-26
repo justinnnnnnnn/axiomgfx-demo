@@ -97,31 +97,26 @@ export default function ThreeMolecularTab({ compound }: ThreeMolecularTabProps) 
 
   return (
     <div className="space-y-4">
-      {/* 3D Molecular Viewer - Clickable Card */}
+      {/* Real 3D Structure Card */}
       <div
-        className="bg-axiom-bg-card-white rounded-lg border border-axiom-border-light p-4 cursor-pointer hover:shadow-md transition-all duration-200 relative group"
-        onClick={() => setIsModalOpen(true)}
+        className="bg-axiom-bg-card rounded-lg border border-axiom-border-light p-4 cursor-pointer hover:shadow-md transition-all duration-200 hover:bg-gray-50"
+        onClick={() => setIsRealModalOpen(true)}
       >
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-lg font-semibold text-axiom-text-primary">
-            Interactive 3D Structure
-          </h4>
-          <div className="flex items-center space-x-2">
-            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">
-              Three.js
-            </span>
-            <span className="text-xs text-axiom-text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
-              Click to expand
-            </span>
-          </div>
+          <h3 className="text-sm font-semibold text-axiom-text-primary">
+            Real 3D Structure
+          </h3>
+          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+            PubChem
+          </span>
         </div>
-        
-        <div className="h-48">
-          <ThreeJSMoleculeViewer compound={compound} className="h-full" />
+
+        <div className="h-48 w-full">
+          <Real3DMoleculeViewer key={compound.name} compound={compound} className="w-full h-full" height={180} />
         </div>
 
         <div className="mt-3 text-xs text-axiom-text-secondary">
-          🖱️ <strong>Interactive:</strong> Click & drag to rotate • Hover to pause
+          🧬 <strong>Authentic:</strong> Real molecular data from PubChem • Click to expand
         </div>
       </div>
 
@@ -260,29 +255,33 @@ export default function ThreeMolecularTab({ compound }: ThreeMolecularTabProps) 
         </div>
       </div>
 
-      {/* Real 3D Structure Card */}
+      {/* 3D Molecular Viewer - Clickable Card */}
       <div
-        className="bg-axiom-bg-card rounded-lg border border-axiom-border-light p-4 cursor-pointer hover:shadow-md transition-all duration-200 hover:bg-gray-50"
-        onClick={() => setIsRealModalOpen(true)}
+        className="bg-axiom-bg-card-white rounded-lg border border-axiom-border-light p-4 cursor-pointer hover:shadow-md transition-all duration-200 relative group"
+        onClick={() => setIsModalOpen(true)}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-axiom-text-primary">
-            Real 3D Structure
-          </h3>
-          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-            PubChem
-          </span>
+          <h4 className="text-lg font-semibold text-axiom-text-primary">
+            Interactive 3D Structure
+          </h4>
+          <div className="flex items-center space-x-2">
+            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">
+              Three.js
+            </span>
+            <span className="text-xs text-axiom-text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+              Click to expand
+            </span>
+          </div>
         </div>
 
-        <div className="h-48 w-full">
-          <Real3DMoleculeViewer key={compound.name} compound={compound} className="w-full h-full" height={180} />
+        <div className="h-48">
+          <ThreeJSMoleculeViewer compound={compound} className="h-full" />
         </div>
 
         <div className="mt-3 text-xs text-axiom-text-secondary">
-          🧬 <strong>Authentic:</strong> Real molecular data from PubChem • Click to expand
+          🖱️ <strong>Interactive:</strong> Click & drag to rotate • Hover to pause
         </div>
       </div>
-
       {/* Expandable Modals */}
       <ExpandableModal
         isOpen={isModalOpen}

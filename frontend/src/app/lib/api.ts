@@ -1,6 +1,6 @@
 import { Compound, DosePoint } from './types';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
 
 export async function fetchCompounds(): Promise<Compound[]> {
   const res = await fetch(`${API_BASE}/api/compounds`, { cache: 'no-store' });

@@ -6,6 +6,20 @@ import Card from "./Card";
 import Button from "./Button";
 // Import new sidebar tabs
 import { ThreeMolecularTab, MLPerformanceTab, BindingAnalysisTab } from "./sidebar-tabs";
+import dynamic from 'next/dynamic';
+import ExpandableModal from "./ExpandableModal";
+import EnhancedReal3DModal from "./sidebar-tabs/modals/EnhancedReal3DModal";
+
+// Dynamically import Real3DMoleculeViewer to prevent SSR issues in overview
+const Real3DMoleculeViewer = dynamic(() => import('./sidebar-tabs/components/Real3DMoleculeViewer'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[180px] bg-axiom-bg-graph-white rounded-lg flex items-center justify-center">
+      <div className="text-axiom-text-secondary text-sm">Loading 3D Structure...</div>
+    </div>
+  )
+});
+
 
 interface CompoundDetailSidebarProps {
   compound: Compound | null;
@@ -85,7 +99,7 @@ const DoseResponseMiniChart = ({ compound }: { compound: Compound }) => {
             strokeWidth="0.5"
           />
         ))}
-        
+
         {/* Dose-response curve */}
         <path
           d={points.map((p, i) =>
@@ -95,7 +109,7 @@ const DoseResponseMiniChart = ({ compound }: { compound: Compound }) => {
           stroke="#4f7ea9"
           strokeWidth="2"
         />
-        
+
         {/* Data points */}
         {points.map((point, i) => (
           <circle
@@ -106,7 +120,7 @@ const DoseResponseMiniChart = ({ compound }: { compound: Compound }) => {
             fill="#4f7ea9"
           />
         ))}
-        
+
         {/* EC50 line */}
         <line
           x1={(Math.log10(compound.ec50) + 1) * 60}
@@ -181,8 +195,8 @@ const CompoundProperties = ({ compound }: { compound: Compound }) => (
     <div className="bg-axiom-bg-graph-white rounded-lg p-3">
       <div className="text-xs text-axiom-text-secondary">Safety Window</div>
       <div className="text-sm font-semibold text-axiom-text-primary">
-        {compound.safetyWindow ? 
-          `${compound.safetyWindow[0].toFixed(1)}-${compound.safetyWindow[1].toFixed(1)}x` : 
+        {compound.safetyWindow ?
+          `${compound.safetyWindow[0].toFixed(1)}-${compound.safetyWindow[1].toFixed(1)}x` :
           'N/A'
         }
       </div>
@@ -238,6 +252,8 @@ const OptimizationSuggestions = ({ compound }: { compound: Compound }) => {
 
 export default function CompoundDetailSidebar({ compound, onClose, className = "" }: CompoundDetailSidebarProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'mechanisms' | 'optimization' | '3d-structure' | 'ml-performance' | 'binding-analysis'>('overview');
+  const [isRealOverviewModalOpen, setIsRealOverviewModalOpen] = useState(false);
+
 
   if (!compound) {
     return null;
@@ -297,6 +313,29 @@ export default function CompoundDetailSidebar({ compound, onClose, className = "
       <div className="p-6 space-y-6">
         {activeTab === 'overview' && (
           <>
+            {/* Real 3D Structure (Overview) */}
+            <div
+              className="bg-axiom-bg-card rounded-lg border border-axiom-border-light p-4 cursor-pointer hover:shadow-md transition-all duration-200 hover:bg-gray-50"
+              onClick={() => setIsRealOverviewModalOpen(true)}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-axiom-text-primary">
+                  Real 3D Structure
+                </h3>
+                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                  PubChem
+                </span>
+              </div>
+
+              <div className="h-48 w-full">
+                <Real3DMoleculeViewer key={compound.name} compound={compound} className="w-full h-full" height={180} />
+              </div>
+
+              <div className="mt-3 text-xs text-axiom-text-secondary">
+                🧬 <strong>Authentic:</strong> Real molecular data from PubChem • Click to expand
+              </div>
+            </div>
+
             {/* Risk Gauge */}
             <div className="text-center">
               <RiskGauge risk={compound.riskScore} category={compound.riskCategory} />
@@ -322,6 +361,16 @@ export default function CompoundDetailSidebar({ compound, onClose, className = "
               <h3 className="text-lg font-semibold text-axiom-text-primary mb-3">Properties</h3>
               <CompoundProperties compound={compound} />
             </div>
+
+                {/* Real 3D Modal for Overview */}
+                <ExpandableModal
+                  isOpen={isRealOverviewModalOpen}
+                  onClose={() => setIsRealOverviewModalOpen(false)}
+                  title={`Real 3D Structure: ${compound.name}`}
+                >
+                  <EnhancedReal3DModal compound={compound} />
+                </ExpandableModal>
+
           </>
         )}
 
@@ -331,7 +380,7 @@ export default function CompoundDetailSidebar({ compound, onClose, className = "
               <h3 className="text-lg font-semibold text-axiom-text-primary mb-3">Toxicity Mechanisms</h3>
               <MechanismChart compound={compound} />
             </div>
-            
+
             <div className="bg-axiom-bg-graph-white rounded-lg p-4">
               <h4 className="font-semibold text-axiom-text-primary mb-2">Key Findings</h4>
               <ul className="text-sm text-axiom-text-secondary space-y-1">
