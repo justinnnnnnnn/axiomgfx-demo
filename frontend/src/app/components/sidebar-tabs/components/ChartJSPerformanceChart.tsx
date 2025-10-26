@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import React, { useEffect, useState } from 'react';
 import { registerChartJS } from '../../../lib/chartjs-config';
 import { Compound } from '../../../lib/types';
 
@@ -10,10 +9,39 @@ interface ChartJSPerformanceChartProps {
 }
 
 export default function ChartJSPerformanceChart({ compound }: ChartJSPerformanceChartProps) {
-  // Register Chart.js components on client side
+  const [chartComponents, setChartComponents] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Register Chart.js components and load react-chartjs-2 on client side
   useEffect(() => {
-    registerChartJS();
+    const loadChartComponents = async () => {
+      try {
+        await registerChartJS();
+        const { Bar, Doughnut, Line } = await import('react-chartjs-2');
+        setChartComponents({ Bar, Doughnut, Line });
+      } catch (error) {
+        console.error('Failed to load chart components:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadChartComponents();
   }, []);
+
+  if (isLoading || !chartComponents) {
+    return (
+      <div className="space-y-4">
+        <div className="h-32 bg-axiom-bg-graph-white rounded animate-pulse"></div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="h-28 bg-axiom-bg-graph-white rounded animate-pulse"></div>
+          <div className="h-28 bg-axiom-bg-graph-white rounded animate-pulse"></div>
+        </div>
+      </div>
+    );
+  }
+
+  const { Bar, Doughnut, Line } = chartComponents;
 
   // Generate performance data based on compound characteristics
   const getPerformanceData = (compound: Compound) => {

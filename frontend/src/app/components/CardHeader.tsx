@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 type CardHeaderProps = {
@@ -6,10 +8,10 @@ type CardHeaderProps = {
   className?: string;
 };
 
-export default function CardHeader({ 
-  children, 
-  variant = 'dark', 
-  className = "" 
+export default function CardHeader({
+  children,
+  variant = 'dark',
+  className = ""
 }: CardHeaderProps) {
   const getVariantStyles = () => {
     switch (variant) {
@@ -29,3 +31,4 @@ export default function CardHeader({
     </div>
   );
 }
+

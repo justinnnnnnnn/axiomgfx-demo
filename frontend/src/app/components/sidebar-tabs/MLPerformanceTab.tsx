@@ -2,8 +2,18 @@
 
 import React, { useState } from 'react';
 import { Compound } from '../../lib/types';
-import ChartJSPerformanceChart from './components/ChartJSPerformanceChart';
-import D3ConfidenceHeatmap from './components/D3ConfidenceHeatmap';
+import dynamic from 'next/dynamic';
+
+// Dynamically import Chart.js components to prevent server-side execution
+const ChartJSPerformanceChart = dynamic(() => import('./components/ChartJSPerformanceChart'), {
+  ssr: false,
+  loading: () => <div className="h-48 bg-axiom-bg-graph-white rounded-lg animate-pulse" />
+});
+
+const D3ConfidenceHeatmap = dynamic(() => import('./components/D3ConfidenceHeatmap'), {
+  ssr: false,
+  loading: () => <div className="h-48 bg-axiom-bg-graph-white rounded-lg animate-pulse" />
+});
 import ExpandableModal from '../ExpandableModal';
 import EnhancedMLPerformanceModal from './modals/EnhancedMLPerformanceModal';
 

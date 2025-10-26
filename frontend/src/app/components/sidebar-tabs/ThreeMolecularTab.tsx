@@ -1,10 +1,22 @@
 "use client";
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Compound } from '../../lib/types';
 import ThreeJSMoleculeViewer from './components/ThreeJSMoleculeViewer';
 import ExpandableModal from '../ExpandableModal';
 import Enhanced3DStructureModal from './modals/Enhanced3DStructureModal';
+import EnhancedReal3DModal from './modals/EnhancedReal3DModal';
+
+// Dynamically import Real3DMoleculeViewer to prevent SSR issues
+const Real3DMoleculeViewer = dynamic(() => import('./components/Real3DMoleculeViewer'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-axiom-bg-graph-white rounded-lg flex items-center justify-center">
+      <div className="text-axiom-text-secondary text-sm">Loading 3D Structure...</div>
+    </div>
+  )
+});
 
 interface ThreeMolecularTabProps {
   compound: Compound;
@@ -12,6 +24,7 @@ interface ThreeMolecularTabProps {
 
 export default function ThreeMolecularTab({ compound }: ThreeMolecularTabProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRealModalOpen, setIsRealModalOpen] = useState(false);
   const getRiskLevel = (score: number) => {
     if (score < 3.3) return { level: 'Low', color: 'text-green-600', bg: 'bg-green-50' };
     if (score < 6.6) return { level: 'Medium', color: 'text-orange-600', bg: 'bg-orange-50' };
@@ -103,8 +116,10 @@ export default function ThreeMolecularTab({ compound }: ThreeMolecularTabProps) 
           </div>
         </div>
         
-        <ThreeJSMoleculeViewer compound={compound} />
-        
+        <div className="h-48">
+          <ThreeJSMoleculeViewer compound={compound} className="h-full" />
+        </div>
+
         <div className="mt-3 text-xs text-axiom-text-secondary">
           🖱️ <strong>Interactive:</strong> Click & drag to rotate • Hover to pause
         </div>
@@ -245,13 +260,44 @@ export default function ThreeMolecularTab({ compound }: ThreeMolecularTabProps) 
         </div>
       </div>
 
-      {/* Expandable Modal */}
+      {/* Real 3D Structure Card */}
+      <div
+        className="bg-axiom-bg-card rounded-lg border border-axiom-border-light p-4 cursor-pointer hover:shadow-md transition-all duration-200 hover:bg-gray-50"
+        onClick={() => setIsRealModalOpen(true)}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-axiom-text-primary">
+            Real 3D Structure
+          </h3>
+          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+            PubChem
+          </span>
+        </div>
+
+        <div className="h-48 w-full">
+          <Real3DMoleculeViewer key={compound.name} compound={compound} className="w-full h-full" height={180} />
+        </div>
+
+        <div className="mt-3 text-xs text-axiom-text-secondary">
+          🧬 <strong>Authentic:</strong> Real molecular data from PubChem • Click to expand
+        </div>
+      </div>
+
+      {/* Expandable Modals */}
       <ExpandableModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={`3D Structure Analysis: ${compound.name}`}
       >
         <Enhanced3DStructureModal compound={compound} />
+      </ExpandableModal>
+
+      <ExpandableModal
+        isOpen={isRealModalOpen}
+        onClose={() => setIsRealModalOpen(false)}
+        title={`Real 3D Structure: ${compound.name}`}
+      >
+        <EnhancedReal3DModal compound={compound} />
       </ExpandableModal>
     </div>
   );

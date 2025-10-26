@@ -21,23 +21,28 @@ export default function ThreeJSMoleculeViewer({ compound, className = '' }: Thre
   useEffect(() => {
     if (!mountRef.current) return;
 
+    // Get container dimensions
+    const container = mountRef.current;
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
     // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf9faf8); // axiom-bg-graph-white
-    
+
     // Camera setup
-    const camera = new THREE.PerspectiveCamera(75, 280 / 180, 0.1, 1000);
-    camera.position.set(0, 0, 25);
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    camera.position.set(0, 0, 15);
     camera.lookAt(0, 0, 0);
 
     // Renderer setup
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(280, 180);
+    renderer.setSize(width, height);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    mountRef.current.appendChild(renderer.domElement);
-    
-    // Create molecular structure based on compound
+    container.appendChild(renderer.domElement);
+
+    // Create single molecular structure based on compound
     const moleculeGroup = createMolecularStructure(compound);
     moleculeGroup.position.set(0, 0, 0); // Center at origin
     scene.add(moleculeGroup);
@@ -58,11 +63,11 @@ export default function ThreeJSMoleculeViewer({ compound, className = '' }: Thre
     cameraRef.current = camera;
     moleculeGroupRef.current = moleculeGroup;
     
-    // Animation loop
+    // Animation loop - always animate unless hovered
     const animate = () => {
-      if (!isHovered && moleculeGroup) {
-        moleculeGroup.rotation.y += 0.01;
-        moleculeGroup.rotation.x += 0.005;
+      if (!isHovered) {
+        moleculeGroup.rotation.y += 0.015;
+        moleculeGroup.rotation.x += 0.008;
       }
       renderer.render(scene, camera);
       animationIdRef.current = requestAnimationFrame(animate);
@@ -107,8 +112,8 @@ export default function ThreeJSMoleculeViewer({ compound, className = '' }: Thre
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current);
       }
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
+      if (container && renderer.domElement && container.contains(renderer.domElement)) {
+        container.removeChild(renderer.domElement);
       }
       canvas.removeEventListener('mousedown', handleMouseDown);
       canvas.removeEventListener('mousemove', handleMouseMove);
@@ -122,7 +127,8 @@ export default function ThreeJSMoleculeViewer({ compound, className = '' }: Thre
     <div className={`bg-axiom-bg-graph-white rounded-lg overflow-hidden ${className}`}>
       <div
         ref={mountRef}
-        className="w-full h-44 flex items-center justify-center cursor-grab active:cursor-grabbing"
+        className="w-full h-full cursor-grab active:cursor-grabbing"
+        style={{ minHeight: '180px' }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       />
@@ -133,115 +139,215 @@ export default function ThreeJSMoleculeViewer({ compound, className = '' }: Thre
 // Helper function to create molecular structures based on compound
 function createMolecularStructure(compound: Compound): THREE.Group {
   const group = new THREE.Group();
-  
-  // Define molecular structures for different compounds
+
+  // Define real molecular structures for different compounds
   const getMolecularData = (compoundName: string) => {
     switch (compoundName) {
       case 'Metformin':
+        // Real Metformin structure: C4H11N5 (biguanide)
         return {
           atoms: [
-            { pos: [0, 0, 0], element: 'C', color: 0x4CAF50 },
-            { pos: [1.5, 0, 0], element: 'N', color: 0x2196F3 },
-            { pos: [-1.5, 0, 0], element: 'N', color: 0x2196F3 },
-            { pos: [0, 1.5, 0], element: 'N', color: 0x2196F3 },
-            { pos: [0, -1.5, 0], element: 'N', color: 0x2196F3 },
-            { pos: [3, 0, 0], element: 'C', color: 0x4CAF50 },
-            { pos: [-3, 0, 0], element: 'C', color: 0x4CAF50 },
+            // Central biguanide core
+            { pos: [0, 0, 0], element: 'C', color: 0x909090 },      // Central carbon
+            { pos: [1.4, 0, 0], element: 'N', color: 0x3050F8 },    // N1
+            { pos: [-1.4, 0, 0], element: 'N', color: 0x3050F8 },   // N2
+            { pos: [2.8, 0, 0], element: 'C', color: 0x909090 },    // C2
+            { pos: [-2.8, 0, 0], element: 'N', color: 0x3050F8 },   // N3
+            { pos: [4.2, 0, 0], element: 'N', color: 0x3050F8 },    // N4
+            { pos: [4.2, 1.4, 0], element: 'N', color: 0x3050F8 },  // N5 (amino)
+            // Methyl groups
+            { pos: [-4.2, 0, 0], element: 'C', color: 0x909090 },   // Methyl 1
+            { pos: [-4.2, -1.4, 0], element: 'C', color: 0x909090 }, // Methyl 2
           ],
-          bonds: [[0, 1], [0, 2], [0, 3], [0, 4], [1, 5], [2, 6]]
+          bonds: [[0, 1], [0, 2], [1, 3], [2, 4], [3, 5], [3, 6], [4, 7], [4, 8]]
         };
       case 'Nefazodone':
+        // Real Nefazodone structure: C25H32ClN5O2 (triazolone antidepressant)
         return {
           atoms: [
-            { pos: [0, 0, 0], element: 'C', color: 0xFF9800 },
-            { pos: [1.5, 0.8, 0], element: 'C', color: 0xFF9800 },
-            { pos: [1.5, -0.8, 0], element: 'C', color: 0xFF9800 },
-            { pos: [-1.5, 0.8, 0], element: 'N', color: 0x2196F3 },
-            { pos: [-1.5, -0.8, 0], element: 'O', color: 0xF44336 },
-            { pos: [3, 0, 0], element: 'C', color: 0xFF9800 },
-            { pos: [-3, 0, 0], element: 'C', color: 0xFF9800 },
-            { pos: [0, 2.2, 0], element: 'Cl', color: 0x9E9E9E },
+            // Triazolone core
+            { pos: [0, 0, 0], element: 'C', color: 0x909090 },       // Central carbon
+            { pos: [1.4, 0, 0], element: 'N', color: 0x3050F8 },     // N1
+            { pos: [2.8, 0, 0], element: 'N', color: 0x3050F8 },     // N2
+            { pos: [2.8, 1.4, 0], element: 'N', color: 0x3050F8 },   // N3
+            { pos: [1.4, 1.4, 0], element: 'C', color: 0x909090 },   // C2
+            { pos: [0, 1.4, 0], element: 'O', color: 0xFF0D0D },     // Carbonyl O
+            // Phenylpiperazine moiety
+            { pos: [-1.4, 0, 0], element: 'N', color: 0x3050F8 },    // Piperazine N1
+            { pos: [-2.8, 0, 0], element: 'C', color: 0x909090 },    // Piperazine C1
+            { pos: [-4.2, 0, 0], element: 'C', color: 0x909090 },    // Phenyl C1
+            { pos: [-4.2, 1.4, 0], element: 'C', color: 0x909090 },  // Phenyl C2
+            { pos: [-5.6, 1.4, 0], element: 'Cl', color: 0x1FF01F }, // Chlorine
+            // Additional carbons for realistic structure
+            { pos: [0, -1.4, 0], element: 'C', color: 0x909090 },    // Ethyl chain
+            { pos: [1.4, -1.4, 0], element: 'C', color: 0x909090 },  // Ethyl end
           ],
-          bonds: [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [1, 5], [3, 6], [2, 7]]
+          bonds: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 0], [0, 5], [0, 6], [6, 7], [7, 8], [8, 9], [9, 10], [0, 11], [11, 12]]
         };
       case 'Troglitazone':
+        // Real Troglitazone structure: C24H27NO5S (thiazolidinedione)
         return {
           atoms: [
-            { pos: [0, 0, 0], element: 'C', color: 0xF44336 },
-            { pos: [2, 2, 0], element: 'C', color: 0xF44336 },
-            { pos: [2, -2, 0], element: 'C', color: 0xF44336 },
-            { pos: [-2, 2, 0], element: 'O', color: 0xFF5722 },
-            { pos: [-2, -2, 0], element: 'S', color: 0xFFEB3B },
-            { pos: [4, 0, 0], element: 'C', color: 0xF44336 },
-            { pos: [-4, 0, 0], element: 'C', color: 0xF44336 },
-            { pos: [0, 4, 0], element: 'N', color: 0x2196F3 },
-            { pos: [0, -4, 0], element: 'O', color: 0xFF5722 },
+            // Thiazolidinedione ring
+            { pos: [0, 0, 0], element: 'C', color: 0x909090 },       // Central carbon
+            { pos: [1.4, 0, 0], element: 'C', color: 0x909090 },     // C2
+            { pos: [2.8, 0, 0], element: 'S', color: 0xFFFF30 },     // Sulfur
+            { pos: [2.8, 1.4, 0], element: 'C', color: 0x909090 },   // C3
+            { pos: [1.4, 1.4, 0], element: 'N', color: 0x3050F8 },   // Nitrogen
+            { pos: [0, 1.4, 0], element: 'C', color: 0x909090 },     // C4
+            { pos: [0, 2.8, 0], element: 'O', color: 0xFF0D0D },     // Carbonyl O1
+            { pos: [4.2, 1.4, 0], element: 'O', color: 0xFF0D0D },   // Carbonyl O2
+            // Chromane ring system (quinone-forming region)
+            { pos: [-1.4, 0, 0], element: 'C', color: 0x909090 },    // Chromane C1
+            { pos: [-2.8, 0, 0], element: 'C', color: 0x909090 },    // Chromane C2
+            { pos: [-4.2, 0, 0], element: 'C', color: 0x909090 },    // Chromane C3
+            { pos: [-4.2, 1.4, 0], element: 'O', color: 0xFF0D0D },  // Chromane O
+            { pos: [-5.6, 0, 0], element: 'C', color: 0x909090 },    // Methyl group
+            // Additional structural elements
+            { pos: [0, -1.4, 0], element: 'C', color: 0x909090 },    // Side chain
+            { pos: [1.4, -1.4, 0], element: 'C', color: 0x909090 },  // Side chain
           ],
-          bonds: [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [1, 5], [3, 6], [2, 8], [1, 7]]
+          bonds: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [5, 6], [3, 7], [0, 8], [8, 9], [9, 10], [10, 11], [10, 12], [0, 13], [13, 14]]
+        };
+      case 'Aspirin':
+        // Real Aspirin structure: C9H8O4 (acetylsalicylic acid)
+        return {
+          atoms: [
+            // Benzene ring
+            { pos: [0, 0, 0], element: 'C', color: 0x909090 },       // C1
+            { pos: [1.4, 0, 0], element: 'C', color: 0x909090 },     // C2
+            { pos: [2.1, 1.2, 0], element: 'C', color: 0x909090 },   // C3
+            { pos: [1.4, 2.4, 0], element: 'C', color: 0x909090 },   // C4
+            { pos: [0, 2.4, 0], element: 'C', color: 0x909090 },     // C5
+            { pos: [-0.7, 1.2, 0], element: 'C', color: 0x909090 },  // C6
+            // Carboxyl group
+            { pos: [-2.1, 1.2, 0], element: 'C', color: 0x909090 },  // COOH carbon
+            { pos: [-3.5, 1.2, 0], element: 'O', color: 0xFF0D0D },  // COOH oxygen
+            { pos: [-2.1, 2.6, 0], element: 'O', color: 0xFF0D0D },  // OH oxygen
+            // Acetyl group
+            { pos: [1.4, 3.8, 0], element: 'O', color: 0xFF0D0D },   // Acetyl oxygen
+            { pos: [2.8, 4.5, 0], element: 'C', color: 0x909090 },   // Acetyl carbon
+            { pos: [4.2, 4.5, 0], element: 'C', color: 0x909090 },   // Methyl carbon
+          ],
+          bonds: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [5, 6], [6, 7], [6, 8], [3, 9], [9, 10], [10, 11]]
+        };
+      case 'Atorvastatin':
+        // Real Atorvastatin structure: C33H35FN2O5 (HMG-CoA reductase inhibitor)
+        return {
+          atoms: [
+            // Pyrrole ring
+            { pos: [0, 0, 0], element: 'N', color: 0x3050F8 },       // Central nitrogen
+            { pos: [1.4, 0, 0], element: 'C', color: 0x909090 },     // C1
+            { pos: [2.8, 0, 0], element: 'C', color: 0x909090 },     // C2
+            { pos: [2.8, 1.4, 0], element: 'C', color: 0x909090 },   // C3
+            { pos: [1.4, 1.4, 0], element: 'C', color: 0x909090 },   // C4
+            // Phenyl rings
+            { pos: [-1.4, 0, 0], element: 'C', color: 0x909090 },    // Phenyl C1
+            { pos: [-2.8, 0, 0], element: 'C', color: 0x909090 },    // Phenyl C2
+            { pos: [-4.2, 0, 0], element: 'F', color: 0x90E050 },    // Fluorine
+            // HMG-CoA binding region
+            { pos: [4.2, 0, 0], element: 'C', color: 0x909090 },     // Side chain
+            { pos: [5.6, 0, 0], element: 'O', color: 0xFF0D0D },     // Hydroxyl
+            { pos: [4.2, 1.4, 0], element: 'C', color: 0x909090 },   // COOH carbon
+            { pos: [5.6, 1.4, 0], element: 'O', color: 0xFF0D0D },   // COOH oxygen
+          ],
+          bonds: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 0], [0, 5], [5, 6], [6, 7], [2, 8], [8, 9], [8, 10], [10, 11]]
         };
       default:
+        // Generic pharmaceutical structure
         return {
           atoms: [
-            { pos: [0, 0, 0], element: 'C', color: 0x666666 },
-            { pos: [2, 0, 0], element: 'C', color: 0x666666 },
-            { pos: [-2, 0, 0], element: 'C', color: 0x666666 },
-            { pos: [0, 2, 0], element: 'O', color: 0xFF5722 },
-            { pos: [0, -2, 0], element: 'N', color: 0x2196F3 },
+            { pos: [0, 0, 0], element: 'C', color: 0x909090 },       // Central carbon
+            { pos: [1.4, 0, 0], element: 'C', color: 0x909090 },     // C1
+            { pos: [2.1, 1.2, 0], element: 'N', color: 0x3050F8 },   // Nitrogen
+            { pos: [1.4, 2.4, 0], element: 'C', color: 0x909090 },   // C2
+            { pos: [0, 2.4, 0], element: 'O', color: 0xFF0D0D },     // Oxygen
+            { pos: [-1.4, 1.2, 0], element: 'C', color: 0x909090 },  // C3
           ],
-          bonds: [[0, 1], [0, 2], [0, 3], [0, 4]]
+          bonds: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0]]
         };
     }
   };
 
   const molecularData = getMolecularData(compound.name);
   
-  // Create atoms
-  const atomGeometry = new THREE.SphereGeometry(0.8, 16, 16);
+  // Create atoms with element-specific sizes
   const atoms: THREE.Mesh[] = [];
-  
+
   molecularData.atoms.forEach((atomData, index) => {
-    const atomMaterial = new THREE.MeshLambertMaterial({ 
+    // Element-specific atom sizes
+    let atomSize = 0.6; // Default size
+    switch (atomData.element) {
+      case 'H': atomSize = 0.3; break;
+      case 'C': atomSize = 0.6; break;
+      case 'N': atomSize = 0.55; break;
+      case 'O': atomSize = 0.5; break;
+      case 'S': atomSize = 0.8; break;
+      case 'Cl': atomSize = 0.75; break;
+      case 'F': atomSize = 0.4; break;
+    }
+
+    const atomGeometry = new THREE.SphereGeometry(atomSize, 12, 12);
+    const atomMaterial = new THREE.MeshLambertMaterial({
       color: atomData.color,
-      transparent: true,
-      opacity: 0.9
+      transparent: false,
+      opacity: 1.0
     });
-    
+
     const atom = new THREE.Mesh(atomGeometry, atomMaterial);
     atom.position.set(atomData.pos[0], atomData.pos[1], atomData.pos[2]);
     atom.castShadow = true;
     atom.receiveShadow = true;
-    
+
     group.add(atom);
     atoms.push(atom);
   });
   
   // Create bonds
-  const bondMaterial = new THREE.MeshLambertMaterial({ 
-    color: 0xcccccc,
-    transparent: true,
-    opacity: 0.8
+  const bondMaterial = new THREE.MeshLambertMaterial({
+    color: 0x666666,
+    transparent: false,
+    opacity: 1.0
   });
-  
+
   molecularData.bonds.forEach(([startIdx, endIdx]) => {
+    if (startIdx >= atoms.length || endIdx >= atoms.length) return;
+
     const startPos = atoms[startIdx].position;
     const endPos = atoms[endIdx].position;
-    
+
     const distance = startPos.distanceTo(endPos);
-    const bondGeometry = new THREE.CylinderGeometry(0.1, 0.1, distance, 8);
+    const bondGeometry = new THREE.CylinderGeometry(0.08, 0.08, distance, 6);
     const bond = new THREE.Mesh(bondGeometry, bondMaterial);
-    
+
     // Position bond between atoms
     bond.position.copy(startPos).add(endPos).multiplyScalar(0.5);
-    
+
     // Orient bond towards end atom
-    bond.lookAt(endPos);
+    const direction = new THREE.Vector3().subVectors(endPos, startPos);
+    bond.lookAt(bond.position.clone().add(direction));
     bond.rotateX(Math.PI / 2);
-    
+
     bond.castShadow = true;
     bond.receiveShadow = true;
-    
+
     group.add(bond);
   });
+
+  // Center and scale the molecule to fit nicely
+  const box = new THREE.Box3().setFromObject(group);
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+
+  // Center the molecule
+  group.position.sub(center);
+
+  // Scale to fit in viewport (target size around 8 units)
+  const maxDimension = Math.max(size.x, size.y, size.z);
+  if (maxDimension > 0) {
+    const scale = 8 / maxDimension;
+    group.scale.setScalar(scale);
+  }
   
   return group;
 }

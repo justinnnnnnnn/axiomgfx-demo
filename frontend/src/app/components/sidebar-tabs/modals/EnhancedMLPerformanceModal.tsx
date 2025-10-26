@@ -1,9 +1,19 @@
 "use client";
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { Compound } from '../../../lib/types';
-import ChartJSPerformanceChart from '../components/ChartJSPerformanceChart';
-import D3ConfidenceHeatmap from '../components/D3ConfidenceHeatmap';
+
+// Dynamically import Chart.js components to prevent server-side execution
+const ChartJSPerformanceChart = dynamic(() => import('../components/ChartJSPerformanceChart'), {
+  ssr: false,
+  loading: () => <div className="h-48 bg-axiom-bg-graph-white rounded-lg animate-pulse" />
+});
+
+const D3ConfidenceHeatmap = dynamic(() => import('../components/D3ConfidenceHeatmap'), {
+  ssr: false,
+  loading: () => <div className="h-48 bg-axiom-bg-graph-white rounded-lg animate-pulse" />
+});
 
 interface EnhancedMLPerformanceModalProps {
   compound: Compound;

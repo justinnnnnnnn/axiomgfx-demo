@@ -1,3 +1,5 @@
+"use client";
+
 // FilterBar component for compound filtering
 
 export type FilterState = {
@@ -143,5 +145,6 @@ export default function FilterBar({
     </div>
   );
 }
+
 
 

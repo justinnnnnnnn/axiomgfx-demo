@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { Compound } from "./CompoundTable";
 import Card from "./Card";
@@ -86,9 +88,9 @@ const DoseResponseMiniChart = ({ compound }: { compound: Compound }) => {
         
         {/* Dose-response curve */}
         <path
-          d={`M ${points.map((p, i) => 
+          d={points.map((p, i) =>
             `${i === 0 ? 'M' : 'L'} ${(Math.log10(p.x) + 1) * 60} ${100 - p.y * 100}`
-          ).join(' ')}`}
+          ).join(' ')}
           fill="none"
           stroke="#4f7ea9"
           strokeWidth="2"

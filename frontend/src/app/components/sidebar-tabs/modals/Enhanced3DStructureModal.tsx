@@ -77,8 +77,8 @@ export default function Enhanced3DStructureModal({ compound }: Enhanced3DStructu
         </div>
         
         {/* Larger viewer for modal */}
-        <div className="h-96 bg-axiom-bg-graph-white rounded-lg border border-axiom-border-light overflow-hidden">
-          <ThreeJSMoleculeViewer compound={compound} className="h-full" />
+        <div className="h-80 bg-axiom-bg-graph-white rounded-lg border border-axiom-border-light overflow-hidden">
+          <ThreeJSMoleculeViewer compound={compound} className="h-full w-full" />
         </div>
         
         <div className="mt-4 grid grid-cols-3 gap-4 text-center">
